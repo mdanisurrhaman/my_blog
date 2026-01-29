@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} Posts - Django Blog{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Category Header -->
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="card-title mb-0">
+                                <i class="bi bi-tag-fill"></i> {{ category.name }}
+                            </h1>
+                            <p class="card-text mt-2">
+                                Browse all posts in the {{ category.name }} category
+                            </p>
+                        </div>
+                        <span class="badge bg-light text-primary fs-5">
+                            {{ posts|length }} post{{ posts|pluralize }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Posts -->
+            {% if posts %}
+                <div class="row">
+                    {% for post in posts %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 post-card shadow-sm">
+                                {% if post.image %}
+                                    <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                                {% endif %}
+                                
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ post.title|truncatechars:60 }}</h5>
+                                    
+                                    <p class="card-text text-muted small">
+                                        <i class="bi bi-person"></i> {{ post.author.username }}
+                                        <br>
+                                        <i class="bi bi-calendar"></i> {{ post.publish_date|date:"M d, Y" }}
+                                    </p>
+                                    
+                                    <p class="card-text">
+                                        {{ post.content|truncatewords:30|striptags }}
+                                    </p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-primary">{{ post.category.name }}</span>
+                                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-sm btn-outline-primary">
+                                            Read More <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-folder-x" style="font-size: 4rem; color: #6c757d;"></i>
+                    </div>
+                    <h3 class="text-muted mb-3">No Posts in This Category</h3>
+                    <p class="text-muted mb-4">
+                        There are no posts in the "{{ category.name }}" category yet.
+                    </p>
+                    <a href="{% url 'home' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> Back to Home
+                    </a>
+                </div>
+            {% endif %}
+            
+            <!-- Back to Home -->
+            <div class="mt-4 text-center">
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to All Posts
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

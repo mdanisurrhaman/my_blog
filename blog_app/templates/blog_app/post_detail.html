@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <article>
+
+                <!-- IMAGE -->
+                {% if post.image %}
+                    <img src="{{ post.image.url }}"
+                         class="img-fluid rounded mb-4"
+                         alt="{{ post.title }}">
+                {% endif %}
+
+                <!-- VIDEO -->
+                {% if post.video %}
+                    <video width="100%" height="400" controls class="mb-4 rounded">
+                        <source src="{{ post.video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% endif %}
+
+                <h1 class="mb-3">{{ post.title }}</h1>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <span class="text-muted">
+                            By {{ post.author }} |
+                            {{ post.publish_date|date:"F d, Y" }}
+                            {% if post.category %}
+                                | Category:
+                                <a href="{% url 'category_posts' post.category.id %}">
+                                    {{ post.category.name }}
+                                </a>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    {% if user == post.author %}
+                        <div>
+                            <a href="{% url 'update_post' post.pk %}"
+                               class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a href="{% url 'delete_post' post.pk %}"
+                               class="btn btn-sm btn-outline-danger">Delete</a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="post-content mb-5">
+                    {{ post.content|linebreaks }}
+                </div>
+            </article>
+
+            <!-- COMMENTS -->
+            <div class="comments-section mt-5">
+                <h3>Comments ({{ comments.count }})</h3>
+
+                {% for comment in comments %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="text-muted">{{ comment.author }}</h6>
+                                <small class="text-muted">
+                                    {{ comment.created_date|timesince }} ago
+                                </small>
+                            </div>
+                            <p>{{ comment.content }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No comments yet.</p>
+                {% endfor %}
+
+                {% if user.is_authenticated %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.content }}
+                        <button class="btn btn-primary mt-2">Submit</button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-info mt-3">
+                        <a href="{% url 'login' %}">Login</a> to comment
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
